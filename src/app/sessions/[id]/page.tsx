@@ -8,6 +8,7 @@ import { headers } from 'next/headers';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import os from 'os';
+import { Suspense } from 'react';
 
 function getLocalIpAddress() {
   const interfaces = os.networkInterfaces();
@@ -21,15 +22,9 @@ function getLocalIpAddress() {
   return 'localhost';
 }
 
-export default async function SessionPage({ params }: { params: Promise<{ id: string }> }) {
-  const sessionUser = await getServerSession(authOptions);
-  if (!sessionUser || !sessionUser.user?.id) {
-    redirect('/api/auth/signin');
-  }
-
-  const resolvedParams = await params;
+async function SessionDetailsServer({ sessionId, baseUrl }: { sessionId: string, baseUrl: string }) {
   const session = await prisma.session.findUnique({
-    where: { id: resolvedParams.id },
+    where: { id: sessionId },
     include: {
       course: {
         include: {
@@ -41,6 +36,57 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
       },
       attendances: {
         orderBy: { timestamp: 'desc' }
+      }
+    }
+  });
+
+  if (!session) return null;
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '3rem' }}>
+      <div style={{ textAlign: 'center' }}>
+        <h2 className="heading-2">Attendance QR</h2>
+        {session.isActive ? (
+          <DynamicQR sessionId={session.id} baseUrl={baseUrl} />
+        ) : (
+          <div style={{ padding: '2rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '12px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+            <p style={{ color: 'var(--danger)', fontWeight: 600 }}>This session is closed.</p>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="heading-2">Attendance Dashboard</h2>
+        <AttendanceList 
+          sessionId={session.id} 
+          initialAttendances={session.attendances} 
+          isActive={session.isActive} 
+          enrollments={session.course.enrollments}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default async function SessionPage({ params }: { params: Promise<{ id: string }> }) {
+  const sessionUser = await getServerSession(authOptions);
+  if (!sessionUser || !sessionUser.user?.id) {
+    redirect('/api/auth/signin');
+  }
+
+  const resolvedParams = await params;
+  
+  // Fetch ONLY basic session info for instant rendering
+  const session = await prisma.session.findUnique({
+    where: { id: resolvedParams.id },
+    select: { 
+      id: true, 
+      name: true, 
+      notes: true, 
+      isActive: true, 
+      courseId: true,
+      course: {
+        select: { code: true, name: true, teacherId: true }
       }
     }
   });
@@ -65,7 +111,6 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
   }
 
   const baseUrl = `${protocol}://${host}`;
-
   const closeSessionWithId = closeSession.bind(null, session.id, session.courseId);
 
   return (
@@ -95,28 +140,14 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '3rem' }}>
-        <div style={{ textAlign: 'center' }}>
-          <h2 className="heading-2">Attendance QR</h2>
-          {session.isActive ? (
-            <DynamicQR sessionId={session.id} baseUrl={baseUrl} />
-          ) : (
-            <div style={{ padding: '2rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '12px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-              <p style={{ color: 'var(--danger)', fontWeight: 600 }}>This session is closed.</p>
-            </div>
-          )}
+      <Suspense fallback={
+        <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+          <div className="spinner"></div>
+          <p className="text-muted" style={{ marginTop: '1rem' }}>กำลังประมวลผลข้อมูลการเช็คชื่อ...</p>
         </div>
-
-        <div>
-          <h2 className="heading-2">Attendance Dashboard</h2>
-          <AttendanceList 
-            sessionId={session.id} 
-            initialAttendances={session.attendances} 
-            isActive={session.isActive} 
-            enrollments={session.course.enrollments}
-          />
-        </div>
-      </div>
+      }>
+        <SessionDetailsServer sessionId={session.id} baseUrl={baseUrl} />
+      </Suspense>
     </div>
   );
 }

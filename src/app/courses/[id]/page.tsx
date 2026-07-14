@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { createSession } from '@/app/actions';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import StudentUpload from '@/components/StudentUpload';
@@ -9,16 +8,11 @@ import CreateSessionModal from '@/components/CreateSessionModal';
 import SessionListClient from '@/components/SessionListClient';
 import StudentListClient from '@/components/StudentListClient';
 import CourseDashboard from '@/components/CourseDashboard';
+import { Suspense } from 'react';
 
-export default async function CoursePage({ params }: { params: Promise<{ id: string }> }) {
-  const sessionUser = await getServerSession(authOptions);
-  if (!sessionUser || !sessionUser.user?.id) {
-    redirect('/api/auth/signin');
-  }
-
-  const resolvedParams = await params;
+async function CourseDetailsServer({ courseId }: { courseId: string }) {
   const course = await prisma.course.findUnique({
-    where: { id: resolvedParams.id, deletedAt: null },
+    where: { id: courseId, deletedAt: null },
     include: {
       sessions: {
         where: { deletedAt: null },
@@ -36,13 +30,7 @@ export default async function CoursePage({ params }: { params: Promise<{ id: str
     }
   });
 
-  if (!course) {
-    notFound();
-  }
-
-  if (course.teacherId !== sessionUser.user.id) {
-    redirect('/'); // Redirect if they don't own it
-  }
+  if (!course) return null;
 
   // Dashboard Data Calculation
   const totalStudents = course.enrollments.length;
@@ -106,6 +94,48 @@ export default async function CoursePage({ params }: { params: Promise<{ id: str
   };
 
   return (
+    <>
+      <CourseDashboard data={dashboardData} />
+
+      <div className="flex-between-responsive" style={{ marginBottom: '1.5rem', marginTop: '2rem' }}>
+        <h2 className="heading-2" style={{ margin: 0 }}>คาบเรียน (Sessions)</h2>
+        <CreateSessionModal courseId={course.id} />
+      </div>
+
+      <SessionListClient sessions={course.sessions} courseId={course.id} />
+
+      <div style={{ marginTop: '3rem' }}>
+        <StudentUpload courseId={course.id} />
+        
+        <StudentListClient enrollments={course.enrollments} courseId={course.id} />
+      </div>
+    </>
+  );
+}
+
+export default async function CoursePage({ params }: { params: Promise<{ id: string }> }) {
+  const sessionUser = await getServerSession(authOptions);
+  if (!sessionUser || !sessionUser.user?.id) {
+    redirect('/api/auth/signin');
+  }
+
+  const resolvedParams = await params;
+  
+  // Fetch ONLY basic course details for instant rendering of the page shell
+  const course = await prisma.course.findUnique({
+    where: { id: resolvedParams.id, deletedAt: null },
+    select: { id: true, code: true, name: true, group: true, notes: true, teacherId: true }
+  });
+
+  if (!course) {
+    notFound();
+  }
+
+  if (course.teacherId !== sessionUser.user.id) {
+    redirect('/'); // Redirect if they don't own it
+  }
+
+  return (
     <main className="glass-container">
       <h1 className="heading-1" style={{ marginBottom: '0.5rem' }}>
         {course.code} - {course.name}
@@ -118,20 +148,14 @@ export default async function CoursePage({ params }: { params: Promise<{ id: str
         </p>
       )}
 
-      <CourseDashboard data={dashboardData} />
-
-      <div className="flex-between-responsive" style={{ marginBottom: '1.5rem' }}>
-        <h2 className="heading-2" style={{ margin: 0 }}>Sessions</h2>
-        <CreateSessionModal courseId={course.id} />
-      </div>
-
-      <SessionListClient sessions={course.sessions} courseId={course.id} />
-
-      <div style={{ marginTop: '2rem' }}>
-        <StudentUpload courseId={course.id} />
-        
-        <StudentListClient enrollments={course.enrollments} courseId={course.id} />
-      </div>
+      <Suspense fallback={
+        <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+          <div className="spinner"></div>
+          <p className="text-muted" style={{ marginTop: '1rem' }}>กำลังประมวลผลข้อมูลและสถิติรายวิชา...</p>
+        </div>
+      }>
+        <CourseDetailsServer courseId={course.id} />
+      </Suspense>
     </main>
   );
 }
