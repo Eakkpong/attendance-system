@@ -23,6 +23,8 @@ model Course {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime? // For soft delete
+
+  @@index([teacherId])
 }
 
 model Student {
@@ -43,6 +45,7 @@ model Enrollment {
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, courseId])
+  @@index([courseId])
 }
 
 // --- NextAuth Models ---
@@ -64,6 +67,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model AuthSession {
@@ -74,6 +78,7 @@ model AuthSession {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@map("Session_Auth")
+  @@index([userId])
 }
 
 model User {
@@ -107,6 +112,8 @@ model Session {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   deletedAt   DateTime?    // For soft delete
+
+  @@index([courseId])
 }
 
 model Attendance {
@@ -119,4 +126,5 @@ model Attendance {
   timestamp   DateTime @default(now())
   
   @@unique([sessionId, studentId]) // A student can only check in once per session
+  @@index([sessionId])
 }

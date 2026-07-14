@@ -33,7 +33,8 @@ export default function AttendanceList({
       }
     };
 
-    const intervalId = setInterval(fetchAttendances, 5000); // Poll every 5s
+    fetchAttendances();
+    const intervalId = setInterval(fetchAttendances, 10000); // Poll every 10s
 
     return () => clearInterval(intervalId);
   }, [sessionId, isActive]);

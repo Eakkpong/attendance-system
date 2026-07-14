@@ -8,9 +8,9 @@ export default function DynamicQR({ sessionId, baseUrl }: { sessionId: string; b
 
   const refreshInterval = 15000; // 15 seconds
 
-  // Poll every 3 seconds to ensure we catch the token change quickly
+  // Poll every 5 seconds to ensure we catch the token change quickly
   // The server token only changes every 15 seconds.
-  const pollInterval = 3000; 
+  const pollInterval = 5000; 
 
   useEffect(() => {
     let isMounted = true;

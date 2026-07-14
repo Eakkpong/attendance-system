@@ -23,7 +23,11 @@ export default async function CoursePage({ params }: { params: Promise<{ id: str
       sessions: {
         where: { deletedAt: null },
         orderBy: { createdAt: 'desc' },
-        include: { attendances: true }
+        include: { 
+          attendances: { 
+            select: { studentId: true } 
+          } 
+        }
       },
       enrollments: {
         include: { student: true },
