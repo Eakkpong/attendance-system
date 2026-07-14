@@ -25,7 +25,7 @@ export default async function CoursePage({ params }: { params: Promise<{ id: str
         orderBy: { createdAt: 'desc' },
         include: { 
           attendances: { 
-            select: { studentId: true } 
+            select: { studentId: true, status: true } 
           } 
         }
       },
@@ -53,7 +53,7 @@ export default async function CoursePage({ params }: { params: Promise<{ id: str
   
   const chronologicalSessions = [...course.sessions].reverse();
   const attendanceTrend = chronologicalSessions.map((session, index) => {
-    const sessionAttendances = session.attendances.length;
+    const sessionAttendances = session.attendances.filter(a => a.status !== 'ABSENT').length;
     totalAttendances += sessionAttendances;
     return {
       sessionName: session.name || `คาบที่ ${index + 1}`,
@@ -72,9 +72,11 @@ export default async function CoursePage({ params }: { params: Promise<{ id: str
 
   course.sessions.forEach(session => {
     session.attendances.forEach(a => {
-      const stats = studentStats.get(a.studentId);
-      if (stats) {
-        stats.attended += 1;
+      if (a.status !== 'ABSENT') {
+        const stats = studentStats.get(a.studentId);
+        if (stats) {
+          stats.attended += 1;
+        }
       }
     });
   });

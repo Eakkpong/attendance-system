@@ -69,19 +69,22 @@ export default function AttendanceList({
       return { bg: 'rgba(0, 0, 0, 0.05)', border: '#9ca3af', text: '#6b7280' };
     }
     switch (status) {
-      case 'PRESENT': return { bg: 'rgba(16, 185, 129, 0.1)', border: 'var(--success)', text: 'var(--success)' };
+      case 'PRESENT': return { bg: 'rgba(16, 185, 129, 0.1)', border: '#10B981', text: '#059669' };
       case 'LATE': return { bg: 'rgba(245, 158, 11, 0.1)', border: '#F59E0B', text: '#D97706' };
-      case 'EXCUSED': return { bg: 'rgba(59, 130, 246, 0.1)', border: '#3B82F6', text: '#2563EB' };
-      default: return { bg: 'rgba(239, 68, 68, 0.1)', border: 'var(--danger)', text: 'var(--danger)' };
+      case 'PERSONAL_LEAVE': return { bg: 'rgba(59, 130, 246, 0.1)', border: '#3B82F6', text: '#2563EB' };
+      case 'SICK_LEAVE': return { bg: 'rgba(168, 85, 247, 0.1)', border: '#A855F7', text: '#9333EA' };
+      case 'ABSENT': return { bg: 'rgba(239, 68, 68, 0.1)', border: '#EF4444', text: '#DC2626' };
+      default: return { bg: '#f1f5f9', border: '#cbd5e1', text: '#64748b' };
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'PRESENT': return 'มาเรียน (Present)';
-      case 'LATE': return 'มาสาย (Late)';
-      case 'EXCUSED': return 'ลา (Excused)';
-      default: return 'ขาดเรียน (Absent)';
+      case 'PRESENT': return 'มาเรียน';
+      case 'LATE': return 'มาสาย';
+      case 'PERSONAL_LEAVE': return 'ลากิจ';
+      case 'SICK_LEAVE': return 'ลาป่วย';
+      case 'ABSENT': return 'ขาดเรียน';
     }
   };
 
@@ -134,7 +137,8 @@ export default function AttendanceList({
                 >
                   <option value="PRESENT">✅ มาเรียน (Present)</option>
                   <option value="LATE">⏰ มาสาย (Late)</option>
-                  <option value="EXCUSED">📝 ลา (Excused)</option>
+                  <option value="PERSONAL_LEAVE">📝 ลากิจ (Personal Leave)</option>
+                  <option value="SICK_LEAVE">🤒 ลาป่วย (Sick Leave)</option>
                   <option value="ABSENT">
                     {isPending ? "⏳ รอเช็คชื่อ (Pending)" : "❌ ขาดเรียน (Absent)"}
                   </option>
@@ -169,7 +173,7 @@ export default function AttendanceList({
                 <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>{record.studentName}</p>
               </div>
               <span style={{ fontSize: '0.85rem', padding: '4px 10px', background: colors.bg, color: colors.text, borderRadius: '999px', fontWeight: 600 }}>
-                {getStatusText(currentStatus)}
+                {getStatusLabel(currentStatus)}
               </span>
             </li>
           );

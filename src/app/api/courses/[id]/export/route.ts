@@ -51,7 +51,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
       let presentCount = 0;
       let lateCount = 0;
-      let excusedCount = 0;
+      let personalLeaveCount = 0;
+      let sickLeaveCount = 0;
       let absentCount = 0;
 
       course.sessions.forEach((session, index) => {
@@ -70,9 +71,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               statusDisplay = `มาสาย (${timeStr})`;
               lateCount++;
               break;
-            case 'EXCUSED':
-              statusDisplay = `ลา (${timeStr})`;
-              excusedCount++;
+            case 'PERSONAL_LEAVE':
+            case 'EXCUSED': // Legacy support
+              statusDisplay = `ลากิจ (${timeStr})`;
+              personalLeaveCount++;
+              break;
+            case 'SICK_LEAVE':
+              statusDisplay = `ลาป่วย (${timeStr})`;
+              sickLeaveCount++;
+              break;
+            case 'ABSENT':
+              statusDisplay = `ขาดเรียน (${timeStr})`;
+              absentCount++;
               break;
             default:
               statusDisplay = `มาเรียน (${timeStr})`; // Fallback for old records without explicit status
@@ -87,7 +97,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
       row['มาเรียนรวม (ครั้ง)'] = presentCount;
       row['มาสายรวม (ครั้ง)'] = lateCount;
-      row['ลารวม (ครั้ง)'] = excusedCount;
+      row['ลากิจรวม (ครั้ง)'] = personalLeaveCount;
+      row['ลาป่วยรวม (ครั้ง)'] = sickLeaveCount;
       row['ขาดเรียนรวม (ครั้ง)'] = absentCount;
       
       const attendanceRate = totalSessions > 0 ? Math.round(((presentCount + lateCount) / totalSessions) * 100) : 100;

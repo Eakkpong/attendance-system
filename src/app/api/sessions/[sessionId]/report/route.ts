@@ -56,10 +56,28 @@ export async function GET(
     let timeStr = '"-"';
     
     if (attendance) {
-      status = '"มา"';
+      switch (attendance.status) {
+        case 'PRESENT':
+          status = '"มาเรียน"';
+          break;
+        case 'LATE':
+          status = '"สาย"';
+          break;
+        case 'PERSONAL_LEAVE':
+        case 'EXCUSED':
+          status = '"ลากิจ"';
+          break;
+        case 'SICK_LEAVE':
+          status = '"ลาป่วย"';
+          break;
+        case 'ABSENT':
+          status = '"ขาด"';
+          break;
+        default:
+          status = '"มาเรียน"';
+      }
       timeStr = `"${new Date(attendance.timestamp).toLocaleTimeString()}"`;
     }
-
     const rowData = [
       `"${student.studentId}"`,
       `"${student.name}"`,
