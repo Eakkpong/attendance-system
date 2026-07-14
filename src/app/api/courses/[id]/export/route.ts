@@ -45,7 +45,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     for (const enrollment of course.enrollments) {
       const student = enrollment.student;
       const row: any = {
-        'รหัสนักศึกษา': student.studentId,
+        'รหัสนักศึกษา': `="${student.studentId}"`,
         'ชื่อ-สกุล': student.name,
       };
 
@@ -61,7 +61,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         
         let statusDisplay = 'ขาดเรียน';
         if (attendanceRecord) {
-          const timeStr = new Date(attendanceRecord.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+          const timeStr = new Date(attendanceRecord.timestamp).toLocaleTimeString('th-TH', { 
+            timeZone: 'Asia/Bangkok', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          });
           switch (attendanceRecord.status) {
             case 'PRESENT':
               statusDisplay = `มาเรียน (${timeStr})`;

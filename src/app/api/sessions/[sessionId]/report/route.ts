@@ -76,10 +76,10 @@ export async function GET(
         default:
           status = '"มาเรียน"';
       }
-      timeStr = `"${new Date(attendance.timestamp).toLocaleTimeString()}"`;
+      timeStr = `"${new Date(attendance.timestamp).toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok' })}"`;
     }
     const rowData = [
-      `"${student.studentId}"`,
+      `"=""${student.studentId}"""`,
       `"${student.name}"`,
       status,
       timeStr

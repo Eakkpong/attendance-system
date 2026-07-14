@@ -148,33 +148,56 @@ export default async function StudentDetailPage({
             <tbody>
               {course.sessions.map((session, index) => {
                 const attendance = attendanceMap.get(session.id);
-                const isPresent = !!attendance;
+                const currentStatus = attendance ? (attendance.status || 'PRESENT') : 'ABSENT';
+                
+                let StatusIcon = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>;
+                let statusLabel = 'มาเรียน';
+                let colors = { bg: 'rgba(16, 185, 129, 0.1)', text: '#059669' };
+
+                switch (currentStatus) {
+                  case 'PRESENT':
+                    break;
+                  case 'LATE':
+                    StatusIcon = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
+                    statusLabel = 'มาสาย';
+                    colors = { bg: 'rgba(245, 158, 11, 0.1)', text: '#D97706' };
+                    break;
+                  case 'PERSONAL_LEAVE':
+                  case 'EXCUSED':
+                    StatusIcon = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
+                    statusLabel = 'ลากิจ';
+                    colors = { bg: 'rgba(59, 130, 246, 0.1)', text: '#2563EB' };
+                    break;
+                  case 'SICK_LEAVE':
+                    StatusIcon = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>;
+                    statusLabel = 'ลาป่วย';
+                    colors = { bg: 'rgba(168, 85, 247, 0.1)', text: '#9333EA' };
+                    break;
+                  case 'ABSENT':
+                    StatusIcon = <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
+                    statusLabel = 'ขาดเรียน';
+                    colors = { bg: 'rgba(239, 68, 68, 0.1)', text: '#DC2626' };
+                    break;
+                }
                 
                 return (
-                  <tr key={session.id} style={{ background: isPresent ? 'transparent' : 'rgba(239, 68, 68, 0.05)' }}>
+                  <tr key={session.id} style={{ background: currentStatus !== 'ABSENT' ? 'transparent' : 'rgba(239, 68, 68, 0.05)' }}>
                     <td style={{ fontWeight: 500 }}>
                       <span style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }}>#{index + 1}</span>
                       {session.name}
                     </td>
                     <td className="text-muted" style={{ fontSize: '0.9rem' }}>
-                      {new Date(session.createdAt).toLocaleDateString('th-TH')}
+                      {new Date(session.createdAt).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' })}
                     </td>
                     <td>
-                      {isPresent ? (
-                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--success)', background: 'rgba(16, 185, 129, 0.1)', padding: '0.35rem 0.75rem', borderRadius: '999px', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                          เข้าเรียน
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: colors.text, background: colors.bg, padding: '0.35rem 0.75rem', borderRadius: '999px', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                          {StatusIcon}
+                          {statusLabel}
                         </span>
-                      ) : (
-                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#EF4444', background: 'rgba(239, 68, 68, 0.1)', padding: '0.35rem 0.75rem', borderRadius: '999px', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                          ขาดเรียน
-                        </span>
-                      )}
                     </td>
                     <td className="text-muted" style={{ fontSize: '0.9rem' }}>
-                      {isPresent ? (
-                        `${new Date(attendance.timestamp).toLocaleDateString('th-TH')} ${new Date(attendance.timestamp).toLocaleTimeString('th-TH')}`
+                      {attendance ? (
+                        `${new Date(attendance.timestamp).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' })} ${new Date(attendance.timestamp).toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok' })}`
                       ) : (
                         '-'
                       )}
