@@ -87,54 +87,52 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
     }
   };
 
+  const [previewStudents, setPreviewStudents] = useState<{id: string, name: string}[]>([]);
+
+  // Update preview whenever pasteData changes
+  const handlePasteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    setPasteData(text);
+    
+    if (!text.trim()) {
+      setPreviewStudents([]);
+      return;
+    }
+
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    const students = [];
+    for (const line of lines) {
+      let parts = line.split('\t');
+      if (parts.length < 2) {
+         const match = line.trim().match(/^(\S+)\s+(.+)$/);
+         if (match) parts = [match[1], match[2]];
+      }
+
+      if (parts.length >= 2) {
+        const id = parts[0].trim();
+        const name = parts.slice(1).join(' ').trim();
+        if (id && name && !id.includes('รหัส') && !id.includes('studentId') && !name.includes('ชื่อ')) {
+          students.push({ id, name });
+        }
+      }
+    }
+    setPreviewStudents(students);
+  };
+
   const handlePasteSubmit = async () => {
-    if (!pasteData.trim()) {
-      setError('กรุณาวางข้อมูลก่อนกดนำเข้า');
+    if (previewStudents.length === 0) {
+      setError('ไม่พบข้อมูลที่สามารถอ่านได้ กรุณาตรวจสอบว่ามี 2 คอลัมน์ (รหัส และ ชื่อ)');
       return;
     }
 
     setLoading(true);
     clearMessages();
     try {
-      // Parse TSV (Tab Separated Values) typically coming from Excel/Google Sheets
-      const lines = pasteData.split('\n').filter(line => line.trim() !== '');
-      const students = [];
-
-      for (const line of lines) {
-        // Excel paste uses tabs. Fallback to space if tab is not found but there are spaces.
-        let parts = line.split('\t');
-        if (parts.length < 2) {
-           // If no tabs, try to split by multiple spaces or single space (less reliable but better than failing)
-           // Regex: split by 1 or more spaces, taking the first as ID and the rest as Name
-           const match = line.trim().match(/^(\S+)\s+(.+)$/);
-           if (match) {
-             parts = [match[1], match[2]];
-           }
-        }
-
-        if (parts.length >= 2) {
-          const id = parts[0].trim();
-          // Join the rest in case name had tabs/spaces
-          const name = parts.slice(1).join(' ').trim();
-          
-          // Skip header rows if user accidentally copied them
-          if (id.includes('รหัส') || id.includes('studentId') || name.includes('ชื่อ')) {
-            continue;
-          }
-
-          if (id && name) {
-            students.push({ studentId: id, name });
-          }
-        }
-      }
-
-      if (students.length === 0) {
-        throw new Error('ไม่พบข้อมูลที่สามารถอ่านได้ กรุณาตรวจสอบว่ามี 2 คอลัมน์ (รหัส และ ชื่อ)');
-      }
-
-      await addStudentsToCourse(courseId, students);
-      setSuccess(`นำเข้ารายชื่อสำเร็จ จำนวน ${students.length} คน`);
+      const studentsToSubmit = previewStudents.map(s => ({ studentId: s.id, name: s.name }));
+      await addStudentsToCourse(courseId, studentsToSubmit);
+      setSuccess(`นำเข้ารายชื่อสำเร็จ จำนวน ${studentsToSubmit.length} คน`);
       setPasteData('');
+      setPreviewStudents([]);
       router.refresh();
     } catch (err: any) {
       setError('เกิดข้อผิดพลาด: ' + err.message);
@@ -148,7 +146,7 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
       <h2 className="heading-2" style={{ marginBottom: '1.5rem', fontSize: '1.25rem' }}>จัดการรายชื่อนักศึกษา</h2>
       
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         <button 
           onClick={() => { setActiveTab('paste'); clearMessages(); }}
           style={{ 
@@ -189,21 +187,71 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
 
       {/* Tab Content: Paste from Excel */}
       {activeTab === 'paste' && (
-        <div>
-          <p className="text-muted" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
-            คัดลอกข้อมูล 2 คอลัมน์ (รหัสนักศึกษา และ ชื่อ-สกุล) จากโปรแกรม Excel / Google Sheets แล้วนำมาวางในกล่องด้านล่างนี้ได้เลย
-          </p>
-          <textarea
-            value={pasteData}
-            onChange={(e) => setPasteData(e.target.value)}
-            placeholder="ตัวอย่างการวาง:&#10;650001    สมชาย ใจดี&#10;650002    สมหญิง รักเรียน"
-            className="input-field"
-            style={{ width: '100%', height: '120px', resize: 'vertical', fontFamily: 'monospace', marginBottom: '1rem' }}
-            disabled={loading}
-          />
-          <button onClick={handlePasteSubmit} disabled={loading || !pasteData.trim()} className="btn" style={{ width: '100%' }}>
-            {loading ? 'กำลังนำเข้าข้อมูล...' : 'นำเข้ารายชื่อ'}
-          </button>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div>
+            <div style={{ marginBottom: '1rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold', fontSize: '0.95rem', color: '#334155' }}>ตัวอย่างการคัดลอกคอลัมน์จาก Excel:</p>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', background: 'white' }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: '1px solid #cbd5e1', padding: '0.4rem', background: '#f1f5f9', textAlign: 'left', color: '#475569' }}>รหัสนักศึกษา</th>
+                    <th style={{ border: '1px solid #cbd5e1', padding: '0.4rem', background: '#f1f5f9', textAlign: 'left', color: '#475569' }}>ชื่อ-สกุล</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ border: '1px solid #cbd5e1', padding: '0.4rem' }}>650001</td>
+                    <td style={{ border: '1px solid #cbd5e1', padding: '0.4rem' }}>สมชาย ใจดี</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #cbd5e1', padding: '0.4rem' }}>650002</td>
+                    <td style={{ border: '1px solid #cbd5e1', padding: '0.4rem' }}>สมหญิง รักเรียน</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <textarea
+              value={pasteData}
+              onChange={handlePasteChange}
+              placeholder="วางข้อมูล (Paste) ลงในช่องนี้..."
+              className="input-field"
+              style={{ width: '100%', height: '150px', resize: 'vertical', fontFamily: 'monospace', marginBottom: '1rem' }}
+              disabled={loading}
+            />
+            <button onClick={handlePasteSubmit} disabled={loading || previewStudents.length === 0} className="btn" style={{ width: '100%' }}>
+              {loading ? 'กำลังนำเข้าข้อมูล...' : `นำเข้ารายชื่อ (${previewStudents.length} คน)`}
+            </button>
+          </div>
+          
+          <div style={{ background: 'rgba(255,255,255,0.5)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.05)', maxHeight: '400px', overflowY: 'auto' }}>
+            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem', color: 'var(--primary-dark)' }}>
+              🔎 พรีวิวข้อมูลที่อ่านได้: <span style={{ background: 'var(--primary-color)', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{previewStudents.length} คน</span>
+            </h3>
+            
+            {previewStudents.length === 0 ? (
+              <div style={{ color: '#94a3b8', fontSize: '0.9rem', textAlign: 'center', padding: '2rem 0' }}>
+                ยังไม่มีข้อมูลให้แสดง<br/>กรุณาวางข้อมูลลงในช่องด้านซ้าย
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                <thead>
+                  <tr>
+                    <th style={{ borderBottom: '2px solid #e2e8f0', padding: '0.5rem', textAlign: 'left' }}>รหัส</th>
+                    <th style={{ borderBottom: '2px solid #e2e8f0', padding: '0.5rem', textAlign: 'left' }}>ชื่อ-สกุล</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {previewStudents.map((student, index) => (
+                    <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '0.5rem', fontFamily: 'monospace' }}>{student.id}</td>
+                      <td style={{ padding: '0.5rem' }}>{student.name}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       )}
 
