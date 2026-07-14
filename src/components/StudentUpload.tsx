@@ -97,16 +97,16 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
     clearMessages();
     try {
       // Parse TSV (Tab Separated Values) typically coming from Excel/Google Sheets
-      const lines = pasteData.split('\\n').filter(line => line.trim() !== '');
+      const lines = pasteData.split('\n').filter(line => line.trim() !== '');
       const students = [];
 
       for (const line of lines) {
         // Excel paste uses tabs. Fallback to space if tab is not found but there are spaces.
-        let parts = line.split('\\t');
+        let parts = line.split('\t');
         if (parts.length < 2) {
            // If no tabs, try to split by multiple spaces or single space (less reliable but better than failing)
            // Regex: split by 1 or more spaces, taking the first as ID and the rest as Name
-           const match = line.trim().match(/^(\\S+)\\s+(.+)$/);
+           const match = line.trim().match(/^(\S+)\s+(.+)$/);
            if (match) {
              parts = [match[1], match[2]];
            }
