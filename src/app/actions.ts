@@ -242,6 +242,24 @@ export async function resetDevice(courseId: string, studentId: string) {
   revalidatePath(`/courses/${courseId}/students/${studentId}`);
 }
 
+export async function updateStudentName(courseId: string, studentId: string, newName: string) {
+  const sessionUser = await getServerSession(authOptions);
+  if (!sessionUser || !sessionUser.user?.id) throw new Error('Unauthorized');
+
+  // Verify course ownership
+  const course = await prisma.course.findUnique({ where: { id: courseId } });
+  if (!course || course.teacherId !== sessionUser.user.id) {
+    throw new Error('Unauthorized');
+  }
+
+  await prisma.student.update({
+    where: { studentId },
+    data: { name: newName }
+  });
+
+  revalidatePath(`/courses/${courseId}`);
+}
+
 export async function upsertAttendance(sessionId: string, studentId: string, status: string) {
   const sessionUser = await getServerSession(authOptions);
   if (!sessionUser || !sessionUser.user?.id) throw new Error('Unauthorized');

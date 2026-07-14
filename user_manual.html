@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>user_manual.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> or <div class="page"></div> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="-คู่มือการใช้งานระบบเช็คชื่อเข้าเรียน-smart-attendance-system">📖 คู่มือการใช้งานระบบเช็คชื่อเข้าเรียน (Smart Attendance System)</h1>
+<p>ยินดีต้อนรับสู่คู่มือการใช้งานระบบเช็คชื่อเข้าเรียนอัจฉริยะ ระบบนี้ถูกออกแบบมาเพื่อช่วยให้อาจารย์สามารถเช็คชื่อนักศึกษาได้อย่างรวดเร็วผ่าน <strong>Dynamic QR Code</strong> พร้อมระบบป้องกันการทุจริต และระบบจัดการสถิติที่ครบวงจร</p>
+<hr>
+<h2 id="1️⃣-ฟีเจอร์-การล็อกอินเข้าสู่ระบบ">1️⃣ ฟีเจอร์: การล็อกอินเข้าสู่ระบบ</h2>
+<p><img src="C:\Users\User.gemini\antigravity\brain\c27b308a-248a-48e2-bb02-5ece02d6b453\media__1783907732198.png" alt="ภาพประกอบการล็อกอินเข้าสู่ระบบ"></p>
+<p>เพื่อความปลอดภัยและง่ายต่อการใช้งาน ระบบรองรับการล็อกอินผ่านบัญชี Google</p>
+<ol>
+<li>เปิดเว็บไซต์ของระบบ (เช่น <code>https://attendance-smkcc.vercel.app</code>)</li>
+<li>กดปุ่ม <strong>&quot;ล็อกอินด้วย Google&quot; (Sign in with Google)</strong></li>
+<li>เลือกบัญชีอีเมลของวิทยาลัย (เช่น <code>@smkcc.ac.th</code>)</li>
+<li>เมื่อล็อกอินสำเร็จ ระบบจะพาคุณเข้าสู่ <strong>หน้ารวมรายวิชา (My Courses)</strong></li>
+</ol>
+<blockquote>
+<p>[!TIP]
+หากเข้าใช้งานครั้งแรกและไม่มีรายวิชา หน้าจอจะโล่ง คุณสามารถเริ่มสร้างรายวิชาแรกได้ทันที</p>
+</blockquote>
+<hr>
+<h2 id="2️⃣-ฟีเจอร์-การจัดการรายวิชาและรายชื่อนักศึกษา">2️⃣ ฟีเจอร์: การจัดการรายวิชาและรายชื่อนักศึกษา</h2>
+<h3 id="-การสร้างรายวิชาใหม่">📝 การสร้างรายวิชาใหม่</h3>
+<ol>
+<li>ที่หน้ารวมรายวิชา กดปุ่ม <strong>&quot;+ สร้างรายวิชาใหม่&quot;</strong></li>
+<li>กรอก <strong>รหัสวิชา</strong> และ <strong>ชื่อวิชา</strong> แล้วกดยืนยัน</li>
+<li>รายวิชาใหม่จะปรากฏขึ้นบนหน้าจอทันที</li>
+</ol>
+<h3 id="-การเพิ่มรายชื่อนักศึกษา-ด้วยไฟล์-csv">👥 การเพิ่มรายชื่อนักศึกษา (ด้วยไฟล์ CSV)</h3>
+<p>เมื่อสร้างวิชาเสร็จแล้ว คุณต้องเพิ่มนักศึกษาเข้ามาในวิชา:</p>
+<ol>
+<li>คลิกเข้าไปในรายวิชาที่ต้องการ</li>
+<li>ไปที่แท็บ <strong>&quot;จัดการนักศึกษา&quot; (Students)</strong></li>
+<li>อัปโหลดไฟล์ <strong>CSV</strong> ที่มีคอลัมน์ <code>studentId</code> และ <code>name</code>
+<em>(ระบบจะดึงรายชื่อเข้าสู่ระบบให้อัตโนมัติ)</em></li>
+<li>หากมีนักศึกษาที่ย้ายกลุ่มหรือลาออก คุณสามารถกดปุ่ม <strong>ไอคอนถังขยะ 🗑️</strong> หลังชื่อนักศึกษาเพื่อลบออกจากวิชาได้ทันที</li>
+</ol>
+<blockquote>
+<p>[!NOTE]
+คุณสามารถเพิ่มรายชื่อนักศึกษาใหม่กี่ครั้งก็ได้ ระบบจะเพิ่มเฉพาะคนใหม่ให้โดยไม่ซ้ำซ้อนกับคนเดิม</p>
+</blockquote>
+<hr>
+<h2 id="3️⃣-ฟีเจอร์-การเช็คชื่อด้วย-dynamic-qr-code">3️⃣ ฟีเจอร์: การเช็คชื่อด้วย Dynamic QR Code</h2>
+<p><img src="C:\Users\User.gemini\antigravity\brain\c27b308a-248a-48e2-bb02-5ece02d6b453\media__1783916095993.png" alt="ภาพประกอบการสแกน QR Code"></p>
+<p>ไฮไลท์ของระบบนี้คือการเช็คชื่อที่รวดเร็วและป้องกันการแคปหน้าจอส่งให้กัน</p>
+<ol>
+<li>เข้าไปที่รายวิชา แล้วกดปุ่ม <strong>&quot;+ สร้างคาบเรียนใหม่&quot; (New Session)</strong></li>
+<li>ระบุหัวข้อการสอนหรือวันที่ แล้วกดสร้าง</li>
+<li>กดปุ่ม <strong>&quot;เปิด QR Code เช็คชื่อ&quot;</strong></li>
+<li>ระบบจะแสดง QR Code บนหน้าจอขนาดใหญ่
+<ul>
+<li>🔄 <strong>QR Code จะเปลี่ยนใหม่ทุกๆ 5 วินาที</strong> (ป้องกันการแคปหน้าจอไปให้เพื่อนสแกนที่บ้าน)</li>
+<li>📱 <strong>จำกัด 1 เครื่อง ต่อ 1 คน:</strong> ถ้านักศึกษาสแกนแล้ว จะเอามือถือเครื่องเดิมไปสแกนให้เพื่อนอีกไม่ได้</li>
+</ul>
+</li>
+<li>รายชื่อนักศึกษาที่สแกนผ่าน จะปรากฏขึ้นบนหน้าจออาจารย์แบบ <strong>Real-time</strong> ทันที</li>
+</ol>
+<blockquote>
+<p>[!IMPORTANT]
+ระบบนี้ <strong>รองรับการสอนออนไลน์</strong> หากอาจารย์แชร์หน้าจอผ่าน Zoom หรือ Google Meet นักศึกษาที่บ้านสามารถสแกนหน้าจอได้เลย โดยระบบมีการเผื่อเวลาดีเลย์ของอินเทอร์เน็ตไว้ให้ 1 นาทีครับ</p>
+</blockquote>
+<hr>
+<h2 id="4️⃣-ฟีเจอร์-การจัดการสถานะและแก้ไขการเข้าเรียน">4️⃣ ฟีเจอร์: การจัดการสถานะและแก้ไขการเข้าเรียน</h2>
+<p>ในหน้าควบคุมคาบเรียน (Session Dashboard) อาจารย์มีอำนาจในการจัดการข้อมูลทั้งหมด:</p>
+<h3 id="-สถานะ-รอเช็คชื่อ">🕒 สถานะ &quot;รอเช็คชื่อ&quot;</h3>
+<ul>
+<li>ระหว่างที่ระบบกำลังเปิดรับ QR Code นักศึกษาที่ยังไม่ได้สแกนจะขึ้นสถานะ <strong>&quot;⏳ รอเช็คชื่อ&quot;</strong> (สีเทา)</li>
+<li>นักศึกษาที่สแกนแล้วจะเด้งขึ้นมาเป็นสถานะ <strong>&quot;✅ มาเรียน&quot;</strong> (สีเขียว)</li>
+</ul>
+<h3 id="-การปิดคาบเรียน-close-session">🛑 การปิดคาบเรียน (Close Session)</h3>
+<ul>
+<li>เมื่อหมดเวลาเช็คชื่อ ให้อาจารย์กดปุ่ม <strong>&quot;ปิดคาบเรียน&quot; (Close Session)</strong></li>
+<li>นักศึกษาคนที่ยังไม่ได้สแกน ระบบจะทำการเปลี่ยนสถานะเป็น <strong>&quot;❌ ขาดเรียน&quot;</strong> (สีแดง) ให้อัตโนมัติ และนักศึกษาจะไม่สามารถสแกน QR Code เพื่อเช็คชื่อย้อนหลังได้อีก</li>
+</ul>
+<h3 id="️-การแก้ไขสถานะด้วยตนเอง-manual-override">✏️ การแก้ไขสถานะด้วยตนเอง (Manual Override)</h3>
+<p>อาจารย์สามารถปรับแก้สถานะของนักศึกษาแต่ละคนได้ตลอดเวลา ผ่าน Dropdown ท้ายชื่อนักศึกษา:</p>
+<ul>
+<li><strong>มาเรียน (Present)</strong></li>
+<li><strong>มาสาย (Late)</strong></li>
+<li><strong>ลา (Excused)</strong></li>
+<li><strong>ขาดเรียน (Absent)</strong>
+<em>(เหมาะสำหรับกรณีนักศึกษามือถือเสีย หรือขออนุญาตลาป่วย)</em></li>
+</ul>
+<hr>
+<h2 id="5️⃣-ฟีเจอร์-แดชบอร์ดสถิติและการดาวน์โหลดรายงาน-export">5️⃣ ฟีเจอร์: แดชบอร์ดสถิติและการดาวน์โหลดรายงาน (Export)</h2>
+<p><img src="C:\Users\User.gemini\antigravity\brain\c27b308a-248a-48e2-bb02-5ece02d6b453\media__1783923349417.jpg" alt="ภาพประกอบแดชบอร์ดสรุปผล"></p>
+<p>ระบบมีการสรุปข้อมูลให้อาจารย์ดูได้ง่ายๆ ในพริบตา:</p>
+<h3 id="-แดชบอร์ดสรุปผลรายวิชา">📊 แดชบอร์ดสรุปผลรายวิชา</h3>
+<ul>
+<li>ไปที่แท็บ <strong>&quot;ภาพรวม&quot; (Dashboard)</strong> ภายในรายวิชา</li>
+<li>ระบบจะแสดง <strong>กราฟเส้น</strong> สรุปเปอร์เซ็นต์การเข้าเรียนของแต่ละคาบเรียน</li>
+<li>ช่วยให้อาจารย์เห็นเทรนด์ว่าคาบไหนเด็กมาเยอะ หรือคาบไหนเด็กขาดเยอะ</li>
+</ul>
+<h3 id="-การดาวน์โหลดรายงานเป็น-excel-csv-export">📥 การดาวน์โหลดรายงานเป็น Excel (CSV Export)</h3>
+<ul>
+<li>สามารถกดปุ่ม <strong>&quot;ดาวน์โหลดรายงาน (CSV)&quot;</strong> ได้จากหน้าแดชบอร์ด</li>
+<li>ระบบจะดึงข้อมูลทั้งหมดออกมาเป็นไฟล์ตาราง นำไปเปิดใน <strong>Excel</strong> หรือ <strong>Google Sheets</strong> ได้ทันที</li>
+<li><strong>ข้อมูลที่ได้:</strong> รหัสนักศึกษา, ชื่อ-สกุล, สถานะการเข้าเรียนแยกตามคาบเรียน, รวมจำนวนครั้งที่มาเรียน/ลา/สาย/ขาด, และเปอร์เซ็นต์การเข้าเรียนรวม</li>
+<li>ไฟล์ถูกเข้ารหัสมาเพื่อรองรับ <strong>ภาษาไทย</strong> 100%</li>
+</ul>
+<hr>
+<p><strong>พัฒนาและออกแบบโดย:</strong>
+งานเทคโนโลยีสารสนเทศ วิทยาลัยชุมชนสมุทรสาคร</p>
+
+</body>
+</html>
