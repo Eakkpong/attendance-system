@@ -8,8 +8,8 @@ export default function Navbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
 
-  // Do not show Navbar on the login page or if not authenticated
-  if (status !== 'authenticated' || pathname === '/login') {
+  // Do not show Navbar on the login page, if not authenticated, or in presentation mode
+  if (status !== 'authenticated' || pathname === '/login' || pathname.includes('/presentation')) {
     return null;
   }
 
