@@ -47,7 +47,7 @@ export default async function PortalPage() {
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
         <h1 className="heading-1" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
-          ยินดีต้อนรับสู่ <span style={{ color: 'var(--primary-color)' }}>SKCC Portal</span>
+          ยินดีต้อนรับสู่ <span style={{ color: 'var(--primary-color)' }}>SMKCC Portal</span>
         </h1>
         <p className="text-muted" style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
           ศูนย์รวมระบบสารสนเทศสำหรับบุคลากร วิทยาลัยชุมชนสมุทรสาคร

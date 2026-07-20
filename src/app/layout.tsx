@@ -11,7 +11,7 @@ const prompt = Prompt({
 });
 
 export const metadata: Metadata = {
-  title: 'SKCC Central Portal',
+  title: 'SMKCC Central Portal',
   description: 'ศูนย์รวมระบบสารสนเทศ วิทยาลัยชุมชนสมุทรสาคร',
 };
 

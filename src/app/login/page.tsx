@@ -7,7 +7,7 @@ export default function LoginPage() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="glass-container" style={{ textAlign: 'center', padding: '3rem', maxWidth: '400px', width: '100%' }}>
         <img src="/logo.png" alt="Logo" style={{ width: '120px', height: 'auto', marginBottom: '1.5rem', objectFit: 'contain' }} />
-        <h1 className="heading-1" style={{ marginBottom: '1rem', fontSize: '1.5rem', lineHeight: '1.4', color: 'var(--primary-color)' }}>SKCC Central Portal<br/>วิทยาลัยชุมชนสมุทรสาคร</h1>
+        <h1 className="heading-1" style={{ marginBottom: '1rem', fontSize: '1.5rem', lineHeight: '1.4', color: 'var(--primary-color)' }}>SMKCC Central Portal<br/>วิทยาลัยชุมชนสมุทรสาคร</h1>
         <p className="text-muted" style={{ marginBottom: '2.5rem', lineHeight: '1.6', fontSize: '0.95rem' }}>
           ศูนย์รวมระบบสารสนเทศสำหรับบุคลากร<br />
           กรุณาเข้าสู่ระบบเพื่อใช้งาน

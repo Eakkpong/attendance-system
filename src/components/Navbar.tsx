@@ -19,7 +19,7 @@ export default function Navbar() {
         {/* Brand / Logo */}
         <Link href="/" className="navbar-brand">
           <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-          <span className="brand-text" style={{ background: 'var(--primary-color)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>SKCC Portal</span>
+          <span className="brand-text" style={{ background: 'var(--primary-color)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>SMKCC Portal</span>
         </Link>
 
         {/* Navigation Links */}
