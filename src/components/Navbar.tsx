@@ -19,7 +19,7 @@ export default function Navbar() {
         {/* Brand / Logo */}
         <Link href="/" className="navbar-brand">
           <img src="/logo.png" alt="Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-          <span className="brand-text" style={{ background: 'var(--primary-color)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>ระบบเช็คชื่อ วิทยาลัยชุมชนสมุทรสาคร</span>
+          <span className="brand-text" style={{ background: 'var(--primary-color)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>SKCC Portal</span>
         </Link>
 
         {/* Navigation Links */}
@@ -28,7 +28,13 @@ export default function Navbar() {
             href="/" 
             className={`nav-link ${pathname === '/' ? 'active' : ''}`}
           >
-            🏠 หน้าแรก
+            🏠 ศูนย์กลาง
+          </Link>
+          <Link 
+            href="/attendance" 
+            className={`nav-link ${pathname.startsWith('/attendance') || pathname.startsWith('/courses') ? 'active' : ''}`}
+          >
+            📝 ระบบเช็คชื่อ
           </Link>
           <Link 
             href="/trash" 

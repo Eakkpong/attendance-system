@@ -380,3 +380,9 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+.portal-card-active:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.15) !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+}
