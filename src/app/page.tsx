@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
-import { authOptions } from './api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 
 export default async function PortalPage() {
   const sessionUser = await getServerSession(authOptions);
   
   if (!sessionUser) {
-    redirect('/api/auth/signin');
+    redirect('/login');
   }
 
   const apps = [

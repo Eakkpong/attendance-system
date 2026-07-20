@@ -11,8 +11,8 @@ const prompt = Prompt({
 });
 
 export const metadata: Metadata = {
-  title: 'ระบบเช็คชื่อ วิทยาลัยชุมชนสมุทรสาคร',
-  description: 'Smart attendance checking for ICCS',
+  title: 'SKCC Central Portal',
+  description: 'ศูนย์รวมระบบสารสนเทศ วิทยาลัยชุมชนสมุทรสาคร',
 };
 
 export default function RootLayout({
