@@ -22,6 +22,16 @@ export default async function PortalPage() {
       textColor: 'var(--primary-color)'
     },
     {
+      id: 'asset',
+      name: 'ระบบบริหารจัดการสินทรัพย์',
+      description: 'จัดการข้อมูลครุภัณฑ์ วัสดุอุปกรณ์ และการยืม-คืนของวิทยาลัย',
+      icon: '📦',
+      href: 'https://smkcc-asset-x.vercel.app',
+      active: true,
+      color: 'rgba(245, 158, 11, 0.1)', // Amber color
+      textColor: '#F59E0B'
+    },
+    {
       id: 'grading',
       name: 'ระบบส่งเกรด (Coming Soon)',
       description: 'บันทึกคะแนนเก็บ ประมวลผลเกรด และส่งออกรายงานผลการเรียน',
