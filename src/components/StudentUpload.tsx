@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Papa from 'papaparse';
 import { addStudentsToCourse } from '@/app/actions';
 import { useRouter } from 'next/navigation';
+import { studentSchema, studentArraySchema } from '@/lib/validations';
 
 export default function StudentUpload({ courseId }: { courseId: string }) {
   const [activeTab, setActiveTab] = useState<'csv' | 'manual' | 'paste'>('paste');
@@ -36,29 +37,29 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
       skipEmptyLines: true,
       complete: async (results) => {
         try {
-          const students = results.data.map((row: any) => {
+          const students = (results.data as Record<string, string>[]).map((row) => {
             const id = row['รหัสนักศึกษา'] || row['studentId'] || row['id'] || row['รหัส'];
             const name = row['ชื่อ-สกุล'] || row['ชื่อ'] || row['name'] || row['fullname'];
             
-            if (!id || !name) {
-              throw new Error('รูปแบบไฟล์ไม่ถูกต้อง ต้องมีคอลัมน์ "รหัสนักศึกษา" และ "ชื่อ-สกุล"');
-            }
-            return { studentId: String(id).trim(), name: String(name).trim() };
+            return { studentId: String(id || '').trim(), name: String(name || '').trim() };
           });
 
-          if (students.length === 0) throw new Error('ไม่พบข้อมูลนักศึกษาในไฟล์');
+          const validationResult = studentArraySchema.safeParse(students);
+          if (!validationResult.success) {
+            throw new Error(validationResult.error.issues[0].message || 'รูปแบบไฟล์ไม่ถูกต้อง');
+          }
 
-          await addStudentsToCourse(courseId, students);
-          setSuccess(`เพิ่มรายชื่อสำเร็จ จำนวน ${students.length} คน`);
+          await addStudentsToCourse(courseId, validationResult.data);
+          setSuccess(`เพิ่มรายชื่อสำเร็จ จำนวน ${validationResult.data.length} คน`);
           router.refresh();
-        } catch (err: any) {
-          setError(err.message);
+        } catch (err: unknown) {
+          setError(err instanceof Error ? err.message : String(err));
         } finally {
           setLoading(false);
           e.target.value = '';
         }
       },
-      error: (err) => {
+      error: () => {
         setError('เกิดข้อผิดพลาดในการอ่านไฟล์');
         setLoading(false);
       }
@@ -75,13 +76,18 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
     setLoading(true);
     clearMessages();
     try {
-      await addStudentsToCourse(courseId, [{ studentId: manualId.trim(), name: manualName.trim() }]);
-      setSuccess(`เพิ่มนักศึกษา ${manualName} สำเร็จ`);
+      const validationResult = studentSchema.safeParse({ studentId: manualId.trim(), name: manualName.trim() });
+      if (!validationResult.success) {
+        throw new Error(validationResult.error.issues[0].message);
+      }
+      
+      await addStudentsToCourse(courseId, [validationResult.data]);
+      setSuccess(`เพิ่มนักศึกษา ${validationResult.data.name} สำเร็จ`);
       setManualId('');
       setManualName('');
       router.refresh();
-    } catch (err: any) {
-      setError('เกิดข้อผิดพลาด: ' + err.message);
+    } catch (err: unknown) {
+      setError('เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }
@@ -101,21 +107,28 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
 
     const lines = text.split('\n').filter(line => line.trim() !== '');
     const students = [];
+    
     for (const line of lines) {
       let parts = line.split('\t');
+      
       if (parts.length < 2) {
          const match = line.trim().match(/^(\S+)\s+(.+)$/);
-         if (match) parts = [match[1], match[2]];
+         if (!match) continue;
+         parts = [match[1], match[2]];
       }
 
-      if (parts.length >= 2) {
-        const id = parts[0].trim();
-        const name = parts.slice(1).join(' ').trim();
-        if (id && name && !id.includes('รหัส') && !id.includes('studentId') && !name.includes('ชื่อ')) {
-          students.push({ id, name });
-        }
+      if (parts.length < 2) continue;
+
+      const id = parts[0].trim();
+      const name = parts.slice(1).join(' ').trim();
+      
+      if (!id || !name || id.includes('รหัส') || id.includes('studentId') || name.includes('ชื่อ')) {
+        continue;
       }
+      
+      students.push({ id, name });
     }
+    
     setPreviewStudents(students);
   };
 
@@ -129,13 +142,18 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
     clearMessages();
     try {
       const studentsToSubmit = previewStudents.map(s => ({ studentId: s.id, name: s.name }));
-      await addStudentsToCourse(courseId, studentsToSubmit);
-      setSuccess(`นำเข้ารายชื่อสำเร็จ จำนวน ${studentsToSubmit.length} คน`);
+      const validationResult = studentArraySchema.safeParse(studentsToSubmit);
+      if (!validationResult.success) {
+        throw new Error(validationResult.error.issues[0].message);
+      }
+      
+      await addStudentsToCourse(courseId, validationResult.data);
+      setSuccess(`นำเข้ารายชื่อสำเร็จ จำนวน ${validationResult.data.length} คน`);
       setPasteData('');
       setPreviewStudents([]);
       router.refresh();
-    } catch (err: any) {
-      setError('เกิดข้อผิดพลาด: ' + err.message);
+    } catch (err: unknown) {
+      setError('เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setLoading(false);
     }
@@ -294,7 +312,7 @@ export default function StudentUpload({ courseId }: { courseId: string }) {
       {activeTab === 'csv' && (
         <div>
           <p className="text-muted" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
-            อัปโหลดไฟล์ CSV ที่มีคอลัมน์ "รหัสนักศึกษา" และ "ชื่อ-สกุล"
+            อัปโหลดไฟล์ CSV ที่มีคอลัมน์ &quot;รหัสนักศึกษา&quot; และ &quot;ชื่อ-สกุล&quot;
           </p>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <label className="btn" style={{ cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>

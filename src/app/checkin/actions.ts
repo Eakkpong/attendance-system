@@ -43,7 +43,7 @@ export async function submitAttendance(formData: FormData) {
       }
     }
 
-    let studentRecord = await prisma.student.findUnique({ where: { studentId } });
+    const studentRecord = await prisma.student.findUnique({ where: { studentId } });
 
     if (enrollmentsCount > 0) {
       if (!studentRecord) {
@@ -83,10 +83,43 @@ export async function submitAttendance(formData: FormData) {
       });
     }
 
+    // Geolocation Anti-Cheat Validation
+    const latStr = formData.get('latitude') as string;
+    const lngStr = formData.get('longitude') as string;
+    const geoError = formData.get('geoError') as string;
+    
+    let studentLat: number | null = null;
+    let studentLng: number | null = null;
+
+    if (latStr && lngStr) {
+      studentLat = parseFloat(latStr);
+      studentLng = parseFloat(lngStr);
+    }
+
+    if (session.requireLocation) {
+      if (!studentLat || !studentLng) {
+        return { error: 'คาบเรียนนี้บังคับเช็คพิกัด กรุณาอนุญาตให้เบราว์เซอร์เข้าถึงตำแหน่ง (GPS) ของคุณ' };
+      }
+
+      if (session.latitude && session.longitude) {
+        const { calculateDistance } = require('@/lib/geo');
+        const distance = calculateDistance(
+          studentLat, studentLng, 
+          session.latitude, session.longitude
+        );
+
+        if (distance > session.radius) {
+          return { error: `คุณอยู่นอกพื้นที่ห้องเรียน (ระยะห่าง ${Math.round(distance)} เมตร จากที่อนุญาต ${session.radius} เมตร)` };
+        }
+      }
+    }
+
     await prisma.attendance.create({
       data: {
         sessionId,
-        studentId
+        studentId,
+        latitude: studentLat,
+        longitude: studentLng
       }
     });
     
@@ -95,9 +128,9 @@ export async function submitAttendance(formData: FormData) {
     revalidatePath(`/sessions/${sessionId}`);
     
     return { success: true };
-  } catch (e: any) {
+  } catch (e: unknown) {
     // Unique constraint violation means already checked in
-    if (e.code === 'P2002') {
+    if (e && typeof e === 'object' && 'code' in e && e.code === 'P2002') {
       return { error: 'You have already checked in to this session.' };
     }
     return { error: 'Failed to record attendance. Please try again.' };

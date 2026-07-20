@@ -44,8 +44,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     for (const enrollment of course.enrollments) {
       const student = enrollment.student;
-      const row: any = {
-        'รหัสนักศึกษา': `="${student.studentId}"`,
+      const row: Record<string, string | number> = {
+        'รหัสนักศึกษา': `\u200B${student.studentId}`, // Zero-width space forces Excel to treat as text
         'ชื่อ-สกุล': student.name,
       };
 
@@ -61,11 +61,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         
         let statusDisplay = 'ขาดเรียน';
         if (attendanceRecord) {
-          const timeStr = new Date(attendanceRecord.timestamp).toLocaleTimeString('th-TH', { 
-            timeZone: 'Asia/Bangkok', 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          });
+          // Fix timezone issue for reliable Bangkok time in all Node environments
+          const d = new Date(attendanceRecord.timestamp);
+          const bkkTime = new Date(d.getTime() + (7 * 60 * 60 * 1000));
+          const hh = bkkTime.getUTCHours().toString().padStart(2, '0');
+          const mm = bkkTime.getUTCMinutes().toString().padStart(2, '0');
+          const timeStr = `${hh}:${mm}`;
+
           switch (attendanceRecord.status) {
             case 'PRESENT':
               statusDisplay = `มาเรียน (${timeStr})`;

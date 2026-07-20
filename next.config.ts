@@ -17,7 +17,6 @@ function getLocalIps() {
 const ips = getLocalIps();
 
 const nextConfig: NextConfig = {
-  // @ts-ignore
   allowedDevOrigins: ips,
   serverExternalPackages: [],
   experimental: {

@@ -102,7 +102,15 @@ export async function permanentlyDeleteCourse(courseId: string) {
   revalidatePath('/trash');
 }
 
-export async function createSession(courseId: string, name: string, notes?: string) {
+export async function createSession(
+  courseId: string, 
+  name: string, 
+  notes?: string, 
+  requireLocation: boolean = false, 
+  latitude?: number | null, 
+  longitude?: number | null, 
+  radius?: number
+) {
   const sessionUser = await getServerSession(authOptions);
   if (!sessionUser || !sessionUser.user?.id) throw new Error('Unauthorized');
 
@@ -116,6 +124,10 @@ export async function createSession(courseId: string, name: string, notes?: stri
       courseId,
       name,
       notes: notes || null,
+      requireLocation,
+      latitude,
+      longitude,
+      radius: radius || 100,
     }
   });
 

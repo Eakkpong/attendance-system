@@ -75,7 +75,7 @@ export default async function StudentDetailPage({
   });
 
   const totalSessions = course.sessions.length;
-  const attendedSessions = attendances.length;
+  const attendedSessions = attendances.filter(a => a.status === 'PRESENT' || a.status === 'LATE').length;
   const attendancePercentage = totalSessions === 0 ? 0 : Math.round((attendedSessions / totalSessions) * 100);
   
   const resetDeviceAction = resetDevice.bind(null, course.id, student.studentId);

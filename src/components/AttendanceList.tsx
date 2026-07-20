@@ -51,7 +51,7 @@ export default function AttendanceList({
         if (existing) {
           return prev.map(a => a.studentId === studentId ? { ...a, status } : a);
         } else {
-          return [...prev, { id: 'temp', sessionId, studentId, studentName: null, status, timestamp: new Date() }];
+          return [...prev, { id: 'temp', sessionId, studentId, studentName: null, status, timestamp: new Date(), latitude: null, longitude: null }];
         }
       });
       

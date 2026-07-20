@@ -15,6 +15,7 @@ export default function CheckinForm({ sessionId, token }: { sessionId: string; t
     // Auto-fill from localStorage if available
     const savedId = localStorage.getItem('studentId');
     if (savedId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStudentId(savedId);
     }
     
@@ -49,6 +50,32 @@ export default function CheckinForm({ sessionId, token }: { sessionId: string; t
     }
 
     try {
+      let lat = '';
+      let lng = '';
+
+      // Try to get geolocation. We will send it to the server and let the server decide if it's required.
+      if (navigator.geolocation) {
+        try {
+          const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
+            });
+          });
+          lat = pos.coords.latitude.toString();
+          lng = pos.coords.longitude.toString();
+          formData.append('latitude', lat);
+          formData.append('longitude', lng);
+        } catch (geoError: any) {
+          // We don't fail here immediately. The server will reject it if requireLocation is true.
+          console.warn('Geolocation error:', geoError);
+          formData.append('geoError', geoError.message || 'Unknown error');
+        }
+      } else {
+        formData.append('geoError', 'Browser does not support GPS');
+      }
+
       const result = await submitAttendance(formData);
 
       if (result.error) {
@@ -59,7 +86,7 @@ export default function CheckinForm({ sessionId, token }: { sessionId: string; t
         setStatus('success');
         setMessage('Attendance recorded successfully!');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setStatus('error');
       setMessage('เครือข่ายขัดข้อง หรือ เซิร์ฟเวอร์ปฏิเสธการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง');
@@ -68,6 +95,7 @@ export default function CheckinForm({ sessionId, token }: { sessionId: string; t
 
   useEffect(() => {
     if (localStorage.getItem(`checkedIn_${sessionId}`)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus('success');
       setMessage('You have already checked in from this device.');
     }

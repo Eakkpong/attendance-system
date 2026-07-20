@@ -3,6 +3,7 @@ import './globals.css';
 import { Prompt } from 'next/font/google';
 import { Providers } from '@/components/Providers';
 import Navbar from '@/components/Navbar';
+import NextTopLoader from 'nextjs-toploader';
 
 const prompt = Prompt({ 
   weight: ['300', '400', '500', '600', '700'],
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="th">
       <body className={prompt.className}>
         <Providers>
+          <NextTopLoader color="var(--primary-color)" showSpinner={false} />
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Navbar />
             <main className="main-content" style={{ flex: 1 }}>

@@ -3,11 +3,13 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const customAdapter = PrismaAdapter(prisma) as any;
 
 export const authOptions: AuthOptions = {
   adapter: {
     ...customAdapter,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     createSession: (session: any) => prisma.authSession.create({ data: session }),
     getSessionAndUser: async (sessionToken: string) => {
       const userAndSession = await prisma.authSession.findUnique({
@@ -18,6 +20,7 @@ export const authOptions: AuthOptions = {
       const { user, ...session } = userAndSession;
       return { user, session };
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updateSession: (session: any) => prisma.authSession.update({ where: { sessionToken: session.sessionToken }, data: session }),
     deleteSession: (sessionToken: string) => prisma.authSession.delete({ where: { sessionToken } }),
   },

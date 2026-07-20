@@ -37,30 +37,30 @@ async function CourseDetailsServer({ courseId }: { courseId: string }) {
   const totalSessions = course.sessions.length;
   
   let overallAttendanceRate = 0;
-  let totalAttendances = 0;
-  
   const chronologicalSessions = [...course.sessions].reverse();
   const attendanceTrend = chronologicalSessions.map((session, index) => {
-    const sessionAttendances = session.attendances.filter(a => a.status !== 'ABSENT').length;
-    totalAttendances += sessionAttendances;
+    const sessionAttendances = session.attendances.filter(a => a.status === 'PRESENT' || a.status === 'LATE').length;
     return {
       sessionName: session.name || `คาบที่ ${index + 1}`,
-      attendanceRate: totalStudents > 0 ? Math.round((sessionAttendances / totalStudents) * 100) : 0
+      attendanceRate: totalStudents > 0 ? Math.round((sessionAttendances / totalStudents) * 100) : 0,
+      sessionAttendances
     };
   });
+  
+  const totalAttendances = attendanceTrend.reduce((acc, curr) => acc + curr.sessionAttendances, 0);
 
   if (totalStudents > 0 && totalSessions > 0) {
     overallAttendanceRate = Math.round((totalAttendances / (totalStudents * totalSessions)) * 100);
   }
 
-  const studentStats = new Map<string, { attended: number, student: any }>();
+  const studentStats = new Map<string, { attended: number, student: { id: string, name: string | null, studentId: string } }>();
   course.enrollments.forEach(e => {
     studentStats.set(e.student.studentId, { attended: 0, student: e.student });
   });
 
   course.sessions.forEach(session => {
     session.attendances.forEach(a => {
-      if (a.status !== 'ABSENT') {
+      if (a.status === 'PRESENT' || a.status === 'LATE') {
         const stats = studentStats.get(a.studentId);
         if (stats) {
           stats.attended += 1;
@@ -74,7 +74,7 @@ async function CourseDetailsServer({ courseId }: { courseId: string }) {
       const rate = totalSessions > 0 ? Math.round((stats.attended / totalSessions) * 100) : 100;
       return {
         id: stats.student.id,
-        name: stats.student.name,
+        name: stats.student.name || 'Unknown',
         studentId: stats.student.studentId,
         attendanceRate: rate,
         attended: stats.attended,

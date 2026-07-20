@@ -108,6 +108,10 @@ model Session {
   notes       String?      // Optional notes for the session
   date        DateTime     @default(now())
   isActive    Boolean      @default(true)
+  requireLocation Boolean  @default(false)
+  latitude    Float?
+  longitude   Float?
+  radius      Int          @default(100)
   attendances Attendance[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -124,6 +128,8 @@ model Attendance {
   studentName String?  // Optional, if they provide it on first checkin
   status      String   @default("PRESENT") // e.g. "PRESENT", "LATE", "EXCUSED", "ABSENT"
   timestamp   DateTime @default(now())
+  latitude    Float?
+  longitude   Float?
   
   @@unique([sessionId, studentId]) // A student can only check in once per session
   @@index([sessionId])
