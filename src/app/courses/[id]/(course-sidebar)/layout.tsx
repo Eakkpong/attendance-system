@@ -47,23 +47,23 @@ export default async function CourseLayout({
             </h1>
             {course.notes && <p className="text-muted" style={{ margin: 0, paddingLeft: '2.5rem' }}>{course.notes}</p>}
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
             <Link 
               href={`/courses/${course.id}/presentation`}
+              title="นำเสนอขึ้นจอ (Presentation Mode)"
               className="btn"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--primary-color)', color: 'white', border: 'none', padding: '0.5rem 1rem' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary-color)', border: 'none', width: '40px', height: '40px', borderRadius: '50%', padding: 0, transition: 'all 0.2s' }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-              นำเสนอขึ้นจอ
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             </Link>
             <a 
               href={`/api/courses/${course.id}/export`} 
               download
+              title="ดาวน์โหลดรายงาน (Export CSV)"
               className="btn"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#10B981', color: 'white', border: 'none', padding: '0.5rem 1rem' }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', border: 'none', width: '40px', height: '40px', borderRadius: '50%', padding: 0, transition: 'all 0.2s' }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              Export CSV
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             </a>
           </div>
         </div>
