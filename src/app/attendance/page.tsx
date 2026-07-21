@@ -16,7 +16,12 @@ export default async function Home() {
 
   const courses = await prisma.course.findMany({
     where: { teacherId: session.user.id, deletedAt: null },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    include: {
+      _count: {
+        select: { enrollments: true }
+      }
+    }
   });
 
   return (

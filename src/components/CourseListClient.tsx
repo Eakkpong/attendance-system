@@ -10,7 +10,25 @@ type Course = {
   name: string;
   group: string | null;
   notes: string | null;
+  _count?: { enrollments: number };
 };
+
+// Helper function to generate deterministic colors based on a string (e.g. group name)
+function getGroupColor(group: string | null) {
+  if (!group) return { bg: 'rgba(0,0,0,0.05)', text: 'var(--text-muted)', border: 'transparent' };
+  
+  let hash = 0;
+  for (let i = 0; i < group.length; i++) {
+    hash = group.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const h = Math.abs(hash % 360);
+  
+  return {
+    bg: `hsl(${h}, 85%, 92%)`,
+    text: `hsl(${h}, 85%, 35%)`,
+    border: `hsl(${h}, 85%, 55%)`
+  };
+}
 
 export default function CourseListClient({ courses }: { courses: Course[] }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,14 +68,32 @@ export default function CourseListClient({ courses }: { courses: Course[] }) {
         <p className="text-muted">ไม่พบรายวิชาที่ค้นหา</p>
       ) : (
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          {filteredCourses.map((course) => (
+          {filteredCourses.map((course) => {
+            const groupColor = getGroupColor(course.group);
+            return (
             <li key={course.id} style={{ marginBottom: '1rem' }}>
-              <div className="course-card" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="course-card" style={{ display: 'flex', flexDirection: 'column', borderLeft: course.group ? `4px solid ${groupColor.border}` : '1px solid var(--glass-border)' }}>
                 <Link href={`/courses/${course.id}`} style={{ textDecoration: 'none', flex: 1 }}>
-                  <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-main)' }}>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-main)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                     {course.code} - {course.name}
-                    {course.group && <span style={{ fontSize: '0.85rem', fontWeight: 'normal', color: 'var(--text-muted)', marginLeft: '0.5rem', backgroundColor: 'rgba(0,0,0,0.05)', padding: '0.15rem 0.5rem', borderRadius: '999px' }}>กลุ่ม {course.group}</span>}
+                    {course.group && (
+                      <span style={{ 
+                        fontSize: '0.85rem', 
+                        fontWeight: 600, 
+                        color: groupColor.text, 
+                        backgroundColor: groupColor.bg, 
+                        padding: '0.2rem 0.6rem', 
+                        borderRadius: '999px' 
+                      }}>
+                        กลุ่ม {course.group}
+                      </span>
+                    )}
                   </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
+                    <p className="text-muted" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      👥 {course._count?.enrollments || 0} คน
+                    </p>
+                  </div>
                   <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>จัดการคาบเรียนและเวลาเรียน &rarr;</p>
                 </Link>
                 <CourseActions 
@@ -69,7 +105,8 @@ export default function CourseListClient({ courses }: { courses: Course[] }) {
                 />
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </div>
